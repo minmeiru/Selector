@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>tree select component</title>
+  
+  <script>
+    const scriptDom = document.createElement('script');
+    // scriptDom.src = `https://dn-ikcrm-files.qbox.me/ik-ifb.min.js?t=${+new Date()}`;  // 七牛 cdn 地址，加入时间戳，防止浏览器本地缓存
+    scriptDom.src = `./dist/ik-tree-select.min.js?t=${+new Date()}`;  // 本地测试地址，加入时间戳，防止浏览器本地缓存
+    document.head.appendChild(scriptDom);
+  </script>
+</head>
+<body>
+  <h1>tree select</h1>
+  
+  <div id="ik_tree_select"></div>
+
+  <script>
+    window.onload = function() {
+      new IkTreeSelect({
+        element: document.getElementById('ik_tree_select'),
+        inputPlaceholder: '搜索部门',
+        selectColTitleText: '成员将属于以下部门',
+        handleSelect: function(opts) {
+          console.log('handle select opts ', opts)
+        },
+      }).run();
+    };
+  </script>
+</body>
+</html>
