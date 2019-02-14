@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import isElement from 'lodash/isElement'
 import App from './App';
 
+import treeData from '../tree-data';
+
 export default function treeSelect({ element, data, inputPlaceholder, selectColTitleText, handleSelect }) {
   let container;
   if (element && isElement(element)) {
@@ -14,7 +16,7 @@ export default function treeSelect({ element, data, inputPlaceholder, selectColT
 
   ReactDOM.render((
     <App
-      data={data}
+      data={treeData.data.lists}
       inputPlaceholder={inputPlaceholder}
       selectColTitleText={selectColTitleText}
       onHandleSelect={handleSelect}

@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button } from 'antd';
+import Tree from './containers/tree/Tree';
 
 const Wrapper = styled.div`
-  width: 100%;
+  width: 600px;
 `;
 
 export default class App extends PureComponent {
@@ -23,23 +24,31 @@ export default class App extends PureComponent {
     onHandleSelect() {},
   };
   
-  state = {};
+  state = {
+  
+  };
   
   constructor(props) {
     super(props);
   }
   
   handleBtnClick = () => {
-    const { onHandleSelect, inputPlaceholder, selectColTitleText } = this.props;
-    if (onHandleSelect) onHandleSelect({ inputPlaceholder, selectColTitleText });
+    const { onHandleSelect } = this.props;
+    if (onHandleSelect) onHandleSelect();
   };
   
   render() {
+    const { data, inputPlaceholder, selectColTitleText } = this.props;
+
     return (
-      <div>
-        tree app
-        <Button type="primary" onClick={this.handleBtnClick}>按钮</Button>
-      </div>
+      <Wrapper>
+        <Tree
+          list={data}
+          placeholder={inputPlaceholder}
+        />
+        
+        <Button type="primary" onClick={this.handleBtnClick} block>按钮</Button>
+      </Wrapper>
     );
   }
 }
