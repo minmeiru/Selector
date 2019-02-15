@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>tree select component</title>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  
+  <style>
+    .panel {
+      display: none;
+      width: 630px;
+      padding: 15px;
+      margin-top: 20px;
+      margin-left: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      background: #fff;
+    }
+  </style>
   
   <script>
     const scriptDom = document.createElement('script');
@@ -15,19 +29,55 @@
 </head>
 <body>
   <h1>tree select</h1>
-  
-  <div id="ik_tree_select"></div>
+  <input class="department_filter" type="text" />
+  <button type="button" class="btn btn-danger clear">清除</button>
 
+  <div class="panel">
+    <div id="ik_tree_select"></div>
+    
+    <div style="margin-top: 20px;">
+      <button type="button" class="btn btn-primary save">保存</button>
+      <button type="button" class="btn btn-default cancel">取消</button>
+    </div>
+  </div>
+
+  <script src="tree-data.js"></script>
   <script>
+    console.log(treeData);
     window.onload = function() {
-      new IkTreeSelect({
+      const ikTreeSelect = new IkTreeSelect({
         element: document.getElementById('ik_tree_select'),
+        data: treeData.data.lists,
         inputPlaceholder: '搜索部门',
-        selectColTitleText: '成员将属于以下部门',
-        handleSelect: function(opts) {
-          console.log('handle select opts ', opts)
+        selectColTitleText: '已选择的部门',
+        onSelect: (data) => {
+          console.log('select data', data);
         },
-      }).run();
+      });
+
+      $('input.department_filter').on('focus', function() {
+        if ($('.panel').is(':visible')) return;
+        $('.panel').show();
+        ikTreeSelect.run();
+      });
+      
+      $('.clear').on('click', function() {
+        ikTreeSelect.clear();
+      });
+      
+      $('.save').on('click', function() {
+        $('.panel').hide();
+        ikTreeSelect.save((result) => {
+          console.log('save', result);
+        });
+      });
+      
+      $('.cancel').on('click', function() {
+        $('.panel').hide();
+        ikTreeSelect.cancel((result) => {
+          console.log('cancel', result);
+        });
+      });
     };
   </script>
 </body>

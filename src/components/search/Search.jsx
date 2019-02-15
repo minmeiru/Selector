@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Input, Icon } from 'antd';
+import trim from 'lodash/trim';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -60,7 +61,7 @@ export default class Search extends React.PureComponent {
     const value = e.target.value;
     
     this.setState({ searchKey: value });
-    if (onSearch) onSearch(value);
+    if (onSearch) onSearch(trim(value));
   };
   
   render() {

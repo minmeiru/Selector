@@ -1,8 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import debounce from 'lodash/debounce';
 import { colors } from '../../utils/style-consts';
+import { Wrapper, SearchResultWrapper, TreeWrapper } from './styled';
 
 import { Tree, Icon } from 'antd';
 import ErrorBoundary from '../../components/feedback/ErrorBoundary';
@@ -13,46 +13,6 @@ import TreeNodeTitle from './TreeNodeTitle';
 
 const TreeNode = Tree.TreeNode;
 
-const Wrapper = styled.div`
-  width: 280px;
-  float: left;
-  padding: 10px 0 20px;
-  background-color: #fff;
-`;
-
-const TreeWrapper = styled.div`
-  display: ${props => props.show ? 'block' : 'none'};
-  width: 100%;
-  height: 300px;
-  overflow: auto;
-  
-  .ant-tree {
-    li {
-      .ant-tree-node-content-wrapper {
-        width: calc(100% - 30px);
-        
-        &:hover {
-          background-color: ${colors.positiveHover};
-        }
-      }
-      
-      .ant-tree-node-selected {
-        background-color: transparent;
-        
-        &:hover {
-          background-color: ${colors.positiveHover};
-        }
-      }
-    }
-  }
-`;
-
-const SearchResultWrapper = styled.div`
-  width: 100%;
-  height: 300px;
-  overflow: auto;
-`;
-
 const iconStyle = {
   color: colors.positive,
 };
@@ -61,10 +21,12 @@ class Index extends React.PureComponent {
   static propTypes = {
     list: PropTypes.array.isRequired,
     selections: PropTypes.array,
+    onSelect: PropTypes.func,
   };
   
   static defaultProps = {
     selections: [],
+    onSelect() {},
   };
   
   // 部门数据结构扁平化
@@ -89,11 +51,7 @@ class Index extends React.PureComponent {
       flattenList: Index.flattenData(props.list),           // 扁平化后的部门列表
       selectionList: props.selections,                      // 当前已被选中的节点数组
       tempSelections: [],                                   // 临时选择的数据
-      lastSelections: props.selections,                     // 上一次选择的数据
     };
-  
-    console.log('flattenList ', Index.flattenData(this.props.list));
-    console.log('list ', this.props.list);
   }
   
   componentDidUpdate(prevProps) {
@@ -104,7 +62,6 @@ class Index extends React.PureComponent {
     if (prevProps.selections !== this.props.selections) {
       this.setState({
         selectionList: this.props.selections,
-        lastSelections: this.props.selections,
       });
     }
   }
@@ -131,6 +88,7 @@ class Index extends React.PureComponent {
 
   // 处理 tree select
   handleTreeSelect = (selectedKeys) => {
+    const { onSelect } = this.props;
     let selectionList = [];
     let tempSelections = [];
   
@@ -144,10 +102,13 @@ class Index extends React.PureComponent {
     });
   
     this.setState({ selectionList, tempSelections });
+    
+    if (onSelect) onSelect(selectionList, tempSelections);
   };
 
   // 搜索结果列表的筛选
   handleSearchListSelect = (result) => {
+    const { onSelect } = this.props;
     let { selectionList, tempSelections } = this.state;
   
     // 判断选择的该项是否包含在已选中的列表中，如果已被选中，再次点击则取消选中状态，否则反之
@@ -168,6 +129,8 @@ class Index extends React.PureComponent {
     }
     
     this.setState({ selectionList: [...selectionList], tempSelections: [...tempSelections] });
+  
+    if (onSelect) onSelect(selectionList, tempSelections);
   };
 
   loopRenderTreeNode = (data, selectedKeys) => {
@@ -231,7 +194,6 @@ class Index extends React.PureComponent {
             />
           </SearchResultWrapper>
         )}
-
       </Wrapper>
     );
   }

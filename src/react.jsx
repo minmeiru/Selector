@@ -3,9 +3,7 @@ import ReactDOM from 'react-dom';
 import isElement from 'lodash/isElement'
 import App from './App';
 
-import treeData from '../tree-data';
-
-export default function treeSelect({ element, data, inputPlaceholder, selectColTitleText, handleSelect }) {
+function init({ element, data = [], inputPlaceholder, selectColTitleText, onSelect }) {
   let container;
   if (element && isElement(element)) {
     container = element;
@@ -16,10 +14,17 @@ export default function treeSelect({ element, data, inputPlaceholder, selectColT
 
   ReactDOM.render((
     <App
-      data={treeData.data.lists}
+      data={data}
       inputPlaceholder={inputPlaceholder}
       selectColTitleText={selectColTitleText}
-      onHandleSelect={handleSelect}
+      onSelect={onSelect}
     />
   ), container);
+}
+
+export default {
+  init,
+  onSave: (cb) => App.onSave(cb),               // 保存选择的数据
+  onCancel: (cb) => App.onCancel(cb),           // 取消当前操作，并清除临时选择的数据，只保留上一次所选择的数据
+  onClear: (cb) => App.onClear(cb),             // 清除所有数据
 }

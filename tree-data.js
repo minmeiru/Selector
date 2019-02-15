@@ -1,4 +1,4 @@
-export default {
+var treeData = {
   "code": 0,
   "message": "接口请求成功",
   "data": {

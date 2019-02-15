@@ -19,7 +19,6 @@ const iconStyle = {
 };
 
 function TreeNodeTitle({ text, active }) {
-  console.log(iconStyle)
   return (
     <Wrapper>
       {text}
