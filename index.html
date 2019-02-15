@@ -10,7 +10,7 @@
   
   <style>
     .panel {
-      display: none;
+      /*display: none;*/
       width: 630px;
       padding: 15px;
       margin-top: 20px;
@@ -41,43 +41,79 @@
     </div>
   </div>
 
-  <script src="tree-data.js"></script>
   <script>
-    console.log(treeData);
+    const token1 = '812033256ea7fcc30a61c6c9a686f206';
+    const token2 = '02eae450e520239bbc7c98273b070e48';
+    
+    const defaultDepartments = [
+      { "id": 4351, "name": "牛磺酸室", "type": "parent" },
+      { "id": 4352, "name": "忍冬科科室", "type": "parent" },
+      { "id": 4355, "name": "444000000", "type": "parent" },
+      { "id": 4373, "name": "99999", "type": "parent" },
+      { "id": 4374, "name": "99999", "type": "parent" },
+      { "id": 4379, "name": "56567667", "type": "parent" },
+      { "id": 4381, "name": "test_dept", "type": "parent" },
+      { "id": 4382, "name": "test_dept2", "type": "parent" }
+    ];
+    
     window.onload = function() {
-      const ikTreeSelect = new IkTreeSelect({
-        element: document.getElementById('ik_tree_select'),
-        data: treeData.data.lists,
-        inputPlaceholder: '搜索部门',
-        selectColTitleText: '已选择的部门',
-        onSelect: (data) => {
-          console.log('select data', data);
+      $.ajax({
+        url: 'http://ding-dev.ikcrm.com/api/pc/report_center/departments',
+        type: 'GET',
+        dataType: 'json',
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader('Authorization', `Token token="${token1}"`)
+        },
+        success: function(res) {
+          console.log('ajax => ', res);
+          if (res.code === 0) {
+            treeSelect(res.data.lists);
+          }
         },
       });
-
-      $('input.department_filter').on('focus', function() {
-        if ($('.panel').is(':visible')) return;
-        $('.panel').show();
+      
+      function treeSelect(data) {
+        const ikTreeSelect = new IkTreeSelect({
+          element: document.getElementById('ik_tree_select'),
+          data,
+          defaultSelections: defaultDepartments,
+          inputPlaceholder: '搜索部门',
+          selectColTitleText: '已选择的部门',
+          isIncludeSub: true,
+          fieldKeys: {
+            subs: 'users',
+            parent: 'department',
+          },
+          onSelect: (data) => {
+            console.log('select data', data);
+          },
+        });
         ikTreeSelect.run();
-      });
-      
-      $('.clear').on('click', function() {
-        ikTreeSelect.clear();
-      });
-      
-      $('.save').on('click', function() {
-        $('.panel').hide();
-        ikTreeSelect.save((result) => {
-          console.log('save', result);
+  
+        // $('input.department_filter').on('focus', function() {
+        //   if ($('.panel').is(':visible')) return;
+        //   $('.panel').show();
+        //   ikTreeSelect.run();
+        // });
+  
+        $('.clear').on('click', function() {
+          ikTreeSelect.clear();
         });
-      });
-      
-      $('.cancel').on('click', function() {
-        $('.panel').hide();
-        ikTreeSelect.cancel((result) => {
-          console.log('cancel', result);
+  
+        $('.save').on('click', function() {
+          // $('.panel').hide();
+          ikTreeSelect.save((result) => {
+            console.log('save', result);
+          });
         });
-      });
+  
+        $('.cancel').on('click', function() {
+          // $('.panel').hide();
+          ikTreeSelect.cancel((result) => {
+            console.log('cancel', result);
+          });
+        });
+      }
     };
   </script>
 </body>

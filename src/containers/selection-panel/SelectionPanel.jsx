@@ -1,23 +1,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { colors } from '../../utils/style-consts';
-import { Wrapper, StyledTitle, StyledContent, StyledItem } from './styled';
+import { Wrapper, StyledTitle, StyledContent, StyledItem, StyledBeforeIcon, StyledAfterIcon } from './styled';
 import { Icon } from 'antd';
 
 import ErrorBoundary from '../../components/feedback/ErrorBoundary';
 
-const beforeIconStyle = {
-  color: colors.positive,
-  marginRight: '10px',
-};
-
-const afterIconStyle = {
-  float: 'right',
-  lineHeight: '32px',
-  marginRight: '10px',
-};
-
-function SelectionPanel({ selectColTitleText, selections, onDelSelection }) {
+function SelectionPanel({ selectColTitleText, selections, onDelSelection, parentIcon, subIcon }) {
   function delSelection(selection) {
     return () => {
       if (onDelSelection) onDelSelection(selection);
@@ -31,13 +19,11 @@ function SelectionPanel({ selectColTitleText, selections, onDelSelection }) {
         {selections.map((item, idx) => {
           return (
             <StyledItem key={idx}>
-              <Icon type="folder" style={beforeIconStyle} theme="filled" />
+              <StyledBeforeIcon>{item.type === 'parent' ? parentIcon : subIcon}</StyledBeforeIcon>
               {item.name}
-              <Icon
-                type="close"
-                style={afterIconStyle}
-                onClick={delSelection(item)}
-              />
+              <StyledAfterIcon>
+                <Icon type="close" onClick={delSelection(item)} />
+              </StyledAfterIcon>
             </StyledItem>
           );
         })}

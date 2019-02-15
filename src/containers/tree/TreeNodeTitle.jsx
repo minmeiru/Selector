@@ -7,10 +7,13 @@ import ErrorBoundary from '../../components/feedback/ErrorBoundary';
 
 const Wrapper = styled.span`
   width: 100%;
+  padding-right: 20px;
+  position: relative;
   
   i {
-    float: right;
-    margin-top: 5px;
+    position: absolute;
+    right: 0;
+    top: 3px;
   }
 `;
 

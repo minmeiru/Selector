@@ -9,7 +9,6 @@ export const Wrapper = styled.div`
 `;
 
 export const TreeWrapper = styled.div`
-  display: ${props => props.show ? 'block' : 'none'};
   width: 100%;
   height: 340px;
   overflow: auto;
@@ -17,8 +16,6 @@ export const TreeWrapper = styled.div`
   .ant-tree {
     li {
       .ant-tree-node-content-wrapper {
-        width: calc(100% - 30px);
-        
         &:hover {
           background-color: ${colors.positiveHover};
         }
@@ -33,10 +30,4 @@ export const TreeWrapper = styled.div`
       }
     }
   }
-`;
-
-export const SearchResultWrapper = styled.div`
-  width: 100%;
-  height: 340px;
-  overflow: auto;
 `;

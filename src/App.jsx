@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { clearfix } from './utils/style-consts';
+import { clearfix, colors } from './utils/style-consts';
 
+import { Icon } from 'antd';
 import Tree from './containers/tree/Tree';
 import SelectionPanel from './containers/selection-panel/SelectionPanel';
 
@@ -17,9 +18,9 @@ class App extends React.Component {
     super(props);
     
     this.state = {
-      selections: [],                     // 当前已被选中的节点数组
-      tempSelections: [],                 // 临时选择的数据
-      lastSelections: [],                 // 上一次选择的数据
+      selections: props.defaultSelections || [],        // 当前已被选中的节点数组
+      tempSelections: [],                               // 临时选择的数据
+      lastSelections: props.defaultSelections || [],    // 上一次选择的数据
     };
 
     App.onSave = this.onSave.bind(this);
@@ -36,25 +37,9 @@ class App extends React.Component {
   
   handleDelSelection = (result) => {
     const { onSelect } = this.props;
-    let { selections, tempSelections } = this.state;
-  
-    // 判断选择的该项是否包含在已选中的列表中，如果已被选中，再次点击则取消选中状态，否则反之
-    if (selections.some(o => o.id === result.id.toString())) {
-      selections = selections.filter(item => {
-        return item.id !== result.id.toString();
-      });
-    } else {
-      selections.push({ id: result.id.toString(), name: result.name });
-    }
-  
-    if (tempSelections.some(o => o.id === result.id.toString())) {
-      tempSelections = tempSelections.filter(item => {
-        return item.id !== result.id.toString();
-      });
-    } else {
-      tempSelections.push({ id: result.id.toString(), name: result.name });
-    }
-  
+    const selections = this.state.selections.filter(item => item.id !== result.id);
+    const tempSelections = this.state.tempSelections.filter(item => item.id !== result.id);
+
     this.setState({ selections: [...selections], tempSelections: [...tempSelections] }, () => {
       if (onSelect) onSelect(this.state.selections);
     });
@@ -63,13 +48,13 @@ class App extends React.Component {
   onSave = (cb) => {
     const { selections } = this.state;
     this.setState({ lastSelections: selections, tempSelections: [] });
-    if (cb) cb(selections.map(o => ({ id: Number(o.id), name: o.name })));
+    if (cb) cb(selections);
   };
   
   onCancel = (cb) => {
     const { lastSelections } = this.state;
     this.setState({ selections: lastSelections, tempSelections: [] });
-    if (cb) cb(lastSelections.map(o => ({ id: Number(o.id), name: o.name })));
+    if (cb) cb(lastSelections);
   };
   
   onClear = (cb) => {
@@ -78,12 +63,16 @@ class App extends React.Component {
   };
   
   render() {
-    const { data, inputPlaceholder, selectColTitleText } = this.props;
+    const { list, flattenList, inputPlaceholder, selectColTitleText, isIncludeSub, parentIcon, subIcon } = this.props;
 
     return (
       <Wrapper>
         <Tree
-          list={data}
+          list={list}
+          flattenList={flattenList}
+          isIncludeSub={isIncludeSub}
+          parentIcon={parentIcon}
+          subIcon={subIcon}
           selections={this.state.selections}
           placeholder={inputPlaceholder}
           onSelect={this.handleSelect}
@@ -91,6 +80,8 @@ class App extends React.Component {
   
         <SelectionPanel
           selections={this.state.selections}
+          parentIcon={parentIcon}
+          subIcon={subIcon}
           selectColTitleText={selectColTitleText}
           onDelSelection={this.handleDelSelection}
         />
@@ -100,16 +91,24 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  data: PropTypes.array,
+  list: PropTypes.array.isRequired,
+  defaultSelections: PropTypes.array,
   inputPlaceholder: PropTypes.string,
   selectColTitleText: PropTypes.string,
+  isIncludeSub: PropTypes.bool,
+  parentIcon: PropTypes.element,
+  subIcon: PropTypes.element,
   onSelect: PropTypes.func,
 };
 
 App.defaultProps = {
-  data: [],
-  inputPlaceholder: '',
-  selectColTitleText: '',
+  list: [],
+  defaultSelections: [],
+  inputPlaceholder: '搜索部门',
+  selectColTitleText: '已选择的部门',
+  isIncludeSub: false,
+  parentIcon: <Icon type="folder" style={{ color: colors.positive }} theme="filled" />,
+  subIcon: <Icon type="file" style={{ color: colors.positive }} theme="filled" />,
   onSelect() {},
 };
 
