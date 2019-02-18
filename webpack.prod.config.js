@@ -2,7 +2,6 @@ const WC = require('webpack-config');
 const ParallelUglify = require('webpack-parallel-uglify-plugin');
 
 module.exports = new WC.Config().merge({
-  devtool: 'cheap-module-source-map',
   plugins: [
     new ParallelUglify({
       uglifyJS: {

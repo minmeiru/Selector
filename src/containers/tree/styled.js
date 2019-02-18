@@ -16,6 +16,8 @@ export const TreeWrapper = styled.div`
   .ant-tree {
     li {
       .ant-tree-node-content-wrapper {
+        padding: 0;
+
         &:hover {
           background-color: ${colors.positiveHover};
         }

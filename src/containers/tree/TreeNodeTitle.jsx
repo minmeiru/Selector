@@ -2,7 +2,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Icon } from 'antd';
-import { colors } from '../../utils/style-consts';
 import ErrorBoundary from '../../components/feedback/ErrorBoundary';
 
 const Wrapper = styled.span`
@@ -17,15 +16,11 @@ const Wrapper = styled.span`
   }
 `;
 
-const iconStyle = {
-  color: colors.positive,
-};
-
 function TreeNodeTitle({ text, active }) {
   return (
     <Wrapper>
       {text}
-      {active && <Icon type="check" style={iconStyle} />}
+      {active && <Icon type="check" />}
     </Wrapper>
   );
 }

@@ -22,6 +22,9 @@ class App extends React.Component {
       tempSelections: [],                               // 临时选择的数据
       lastSelections: props.defaultSelections || [],    // 上一次选择的数据
     };
+  
+    this.parentIcon = <Icon style={{ color: props.icons.parent.color || colors.positive }} {...props.icons.parent} />;
+    this.subIcon = <Icon style={{ color: props.icons.sub.color || colors.positive }} {...props.icons.sub} />;
 
     App.onSave = this.onSave.bind(this);
     App.onCancel = this.onCancel.bind(this);
@@ -29,19 +32,19 @@ class App extends React.Component {
   }
 
   handleSelect = (selectionList, tempSelections) => {
-    const { onSelect } = this.props;
+    const { onChange } = this.props;
     this.setState({ selections: [...selectionList], tempSelections: [...tempSelections] }, () => {
-      if (onSelect) onSelect(this.state.selections);
+      if (onChange) onChange(this.state.selections);
     });
   };
   
   handleDelSelection = (result) => {
-    const { onSelect } = this.props;
+    const { onChange } = this.props;
     const selections = this.state.selections.filter(item => item.id !== result.id);
     const tempSelections = this.state.tempSelections.filter(item => item.id !== result.id);
 
     this.setState({ selections: [...selections], tempSelections: [...tempSelections] }, () => {
-      if (onSelect) onSelect(this.state.selections);
+      if (onChange) onChange(this.state.selections);
     });
   };
   
@@ -63,7 +66,7 @@ class App extends React.Component {
   };
   
   render() {
-    const { list, flattenList, inputPlaceholder, selectColTitleText, isIncludeSub, parentIcon, subIcon } = this.props;
+    const { list, flattenList, inputPlaceholder, selectColTitleText, isIncludeSub } = this.props;
 
     return (
       <Wrapper>
@@ -71,8 +74,8 @@ class App extends React.Component {
           list={list}
           flattenList={flattenList}
           isIncludeSub={isIncludeSub}
-          parentIcon={parentIcon}
-          subIcon={subIcon}
+          parentIcon={this.parentIcon}
+          subIcon={this.subIcon}
           selections={this.state.selections}
           placeholder={inputPlaceholder}
           onSelect={this.handleSelect}
@@ -80,8 +83,8 @@ class App extends React.Component {
   
         <SelectionPanel
           selections={this.state.selections}
-          parentIcon={parentIcon}
-          subIcon={subIcon}
+          parentIcon={this.parentIcon}
+          subIcon={this.subIcon}
           selectColTitleText={selectColTitleText}
           onDelSelection={this.handleDelSelection}
         />
@@ -92,13 +95,12 @@ class App extends React.Component {
 
 App.propTypes = {
   list: PropTypes.array.isRequired,
+  icons: PropTypes.object.isRequired,
   defaultSelections: PropTypes.array,
   inputPlaceholder: PropTypes.string,
   selectColTitleText: PropTypes.string,
   isIncludeSub: PropTypes.bool,
-  parentIcon: PropTypes.element,
-  subIcon: PropTypes.element,
-  onSelect: PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 App.defaultProps = {
@@ -107,9 +109,7 @@ App.defaultProps = {
   inputPlaceholder: '搜索部门',
   selectColTitleText: '已选择的部门',
   isIncludeSub: false,
-  parentIcon: <Icon type="folder" style={{ color: colors.positive }} theme="filled" />,
-  subIcon: <Icon type="file" style={{ color: colors.positive }} theme="filled" />,
-  onSelect() {},
+  onChange() {},
 };
 
 export default App;

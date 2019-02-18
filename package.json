@@ -31,7 +31,6 @@
     "babel-plugin-import": "^1.11.0",
     "css-loader": "^2.1.0",
     "less-loader": "^4.1.0",
-    "mini-css-extract-plugin": "^0.5.0",
     "react-hot-loader": "^4.6.5",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",

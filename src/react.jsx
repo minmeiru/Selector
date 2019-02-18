@@ -11,9 +11,22 @@ import App from './App';
  * @param defaultSelections  {array}  默认选中的节点
  * @param isIncludeSub  {boolean}  是否展示子元素,默认不展示
  * @param fieldKeys  {object}  需要转化的字段匹配对应表 { subs: '', parent: '' }
+ * @param icons  {object}  根据 antd icons 库中的图标，设置 icon 默认：
+ *          {
+ *            subs: {
+ *              type: 'user',
+ *              color: '',
+ *              theme: 'outlined',    // 'filled' | 'outlined'
+ *            },
+ *            parent: {
+ *              type: 'folder',
+ *              color: '',
+ *              theme: 'outlined',    // 'filled' | 'outlined'
+ *            },
+ *          }
  * @param inputPlaceholder  {string}  搜索框 placeholder
  * @param selectColTitleText  {string}  右侧选中区域的标题
- * @param onSelect  {function}  选中/取消等操作的回调函数
+ * @param onChange  {function}  选中/取消等操作的回调函数
  */
 function init({
     element,
@@ -21,9 +34,21 @@ function init({
     defaultSelections = [],
     isIncludeSub = false,
     fieldKeys = { subs: 'users', parent: 'department' },
+    icons = {
+      sub: {
+        type: 'user',
+        color: '',
+        theme: 'outlined',
+      },
+      parent: {
+        type: 'folder',
+        color: '',
+        theme: 'outlined',
+      },
+    },
     inputPlaceholder,
     selectColTitleText,
-    onSelect,
+    onChange,
   }) {
   let container;
   if (element && isElement(element)) {
@@ -37,23 +62,24 @@ function init({
   const list = loop(cloneDeep(data), fieldKeys);
   // 拉平数据结构
   const flattenList = flattenData(data, null, fieldKeys, isIncludeSub);
-  
+
   // 默认列表中的数据必须都被包含在 list 列表中
   let defaultData = [];
   defaultSelections.forEach(item => {
-    const findItem = list.find(o => o.id === item.id);
+    const findItem = flattenList.find(o => o.id === item.id);
     if (findItem) defaultData.push(findItem);
   });
 
   ReactDOM.render((
     <App
       list={list}
+      icons={icons}
       defaultSelections={defaultData}
       flattenList={flattenList}
       isIncludeSub={isIncludeSub}
       inputPlaceholder={inputPlaceholder}
       selectColTitleText={selectColTitleText}
-      onSelect={onSelect}
+      onChange={onChange}
     />
   ), container);
 }

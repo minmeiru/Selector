@@ -10,7 +10,7 @@
   
   <style>
     .panel {
-      /*display: none;*/
+      display: none;
       width: 630px;
       padding: 15px;
       margin-top: 20px;
@@ -18,19 +18,68 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       background: #fff;
     }
+    
+    .department_filter {
+      display: inline-block;
+      width: 200px;
+      height: 32px;
+      line-height: 1.5;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+      padding: 4px 11px;
+      background-color: #fff;
+      color: rgba(0, 0, 0, 0.65);
+      vertical-align: bottom;
+    }
+    
+    .department_filter--content {
+      background-color: #00f;
+      border-radius: 5px;
+      padding: 0 20px 0 5px;
+      color: #fff;
+      position: relative;
+    }
+
+    .department_filter--content__clear {
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 10;
+      cursor: pointer;
+      width: 20px;
+      height: 100%;
+      text-align: center;
+      line-height: 22px;
+    }
+    
+    .department_filter--content span {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .department_filter--content span:first-child {
+      width: calc(100% - 90px);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
   </style>
   
   <script>
     const scriptDom = document.createElement('script');
-    // scriptDom.src = `https://dn-ikcrm-files.qbox.me/ik-ifb.min.js?t=${+new Date()}`;  // 七牛 cdn 地址，加入时间戳，防止浏览器本地缓存
-    scriptDom.src = `./dist/ik-tree-select.min.js?t=${+new Date()}`;  // 本地测试地址，加入时间戳，防止浏览器本地缓存
+    scriptDom.src = `./dist/ik-tree-panel.min.js?t=${+new Date()}`;  // 本地测试地址，加入时间戳，防止浏览器本地缓存
     document.head.appendChild(scriptDom);
   </script>
 </head>
 <body>
   <h1>tree select</h1>
-  <input class="department_filter" type="text" />
-  <button type="button" class="btn btn-danger clear">清除</button>
+  <div class="department_filter">
+    <div class="department_filter--content">
+      <div class="content"></div>
+      <div class="department_filter--content__clear glyphicon glyphicon-remove"></div>
+    </div>
+  </div>
 
   <div class="panel">
     <div id="ik_tree_select"></div>
@@ -53,7 +102,7 @@
       { "id": 4374, "name": "99999", "type": "parent" },
       { "id": 4379, "name": "56567667", "type": "parent" },
       { "id": 4381, "name": "test_dept", "type": "parent" },
-      { "id": 4382, "name": "test_dept2", "type": "parent" }
+      { "id": 4382, "name": "test_dept2", "type": "parent" },
     ];
     
     window.onload = function() {
@@ -62,10 +111,9 @@
         type: 'GET',
         dataType: 'json',
         beforeSend: function(xhr) {
-          xhr.setRequestHeader('Authorization', `Token token="${token1}"`)
+          xhr.setRequestHeader('Authorization', `Token token="${token2}"`)
         },
         success: function(res) {
-          console.log('ajax => ', res);
           if (res.code === 0) {
             treeSelect(res.data.lists);
           }
@@ -73,46 +121,73 @@
       });
       
       function treeSelect(data) {
-        const ikTreeSelect = new IkTreeSelect({
+        const defaultDepartmentNames = defaultDepartments.map(o => o.name);
+
+        const ikTreeSelect = new IkTreePanelFilter({
           element: document.getElementById('ik_tree_select'),
           data,
           defaultSelections: defaultDepartments,
           inputPlaceholder: '搜索部门',
-          selectColTitleText: '已选择的部门',
-          isIncludeSub: true,
+          selectColTitleText: '已选择的用户',
+          isIncludeSub: false,
           fieldKeys: {
             subs: 'users',
             parent: 'department',
           },
-          onSelect: (data) => {
+          icons: {
+            sub: {
+              type: 'user',
+            },
+            parent: {
+              type: 'folder',
+              theme: 'filled',
+            },
+          },
+          onChange: (data) => {
             console.log('select data', data);
+            const list = data.map(o => o.name);
+            render(list.join('、'), list.length);
           },
         });
         ikTreeSelect.run();
   
-        // $('input.department_filter').on('focus', function() {
-        //   if ($('.panel').is(':visible')) return;
-        //   $('.panel').show();
-        //   ikTreeSelect.run();
-        // });
+        $('.department_filter').on('click', function() {
+          if ($('.panel').is(':visible')) return;
+          $('.panel').show();
+          ikTreeSelect.run();
+        });
   
-        $('.clear').on('click', function() {
+        $('.department_filter--content__clear').on('click', function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          
           ikTreeSelect.clear();
         });
   
         $('.save').on('click', function() {
-          // $('.panel').hide();
+          $('.panel').hide();
           ikTreeSelect.save((result) => {
             console.log('save', result);
           });
         });
   
         $('.cancel').on('click', function() {
-          // $('.panel').hide();
+          $('.panel').hide();
           ikTreeSelect.cancel((result) => {
             console.log('cancel', result);
           });
         });
+  
+  
+        function render(str, len) {
+          const departmentFilterContentHtmlStr = `
+            <span>${str}</span>
+            <span>等${len}个用户</span>
+          `;
+          $('.department_filter--content').find('.content').html(departmentFilterContentHtmlStr);
+        }
+  
+        render(defaultDepartmentNames.join('、'), defaultDepartmentNames.length);
       }
     };
   </script>
