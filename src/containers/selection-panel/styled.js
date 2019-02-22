@@ -4,8 +4,6 @@ export const Wrapper = styled.div`
   padding-left: 20px;
   float: left;
   width: 300px;
-  overflow-x: hidden;
-  overflow-y: auto;
   background: #fff;
   border-left: 1px solid #d9d9d9;
 `;
@@ -19,7 +17,9 @@ export const StyledTitle = styled.div`
 
 export const StyledContent = styled.div`
   width: 100%;
-  height: 340px;
+  height: 250px;
+  overflow-x: hidden;
+  overflow-y: auto;
 `;
 
 export const StyledItem = styled.div`

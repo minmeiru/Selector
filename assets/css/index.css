@@ -1,0 +1,90 @@
+.tree_panel_filter {
+  position: relative;
+  width: 250px;
+}
+
+.tree_panel_filter--select,
+.tree_panel_filter--select_raised {
+  display: inline-block;
+  width: 250px;
+  height: 32px;
+  line-height: 1.5;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 3px 11px;
+  background-color: #fff;
+  color: rgba(0, 0, 0, 0.65);
+  position: relative;
+  vertical-align: middle;
+}
+
+.tree_panel_filter--select i,
+.tree_panel_filter--select_raised i{
+  position: absolute;
+  right: 10px;
+  top: 5px;
+}
+
+.tree_panel_filter--content,
+.tree_panel_filter--content_raised {
+  display: none;
+  width: 200px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0 20px 0 5px;
+  position: relative;
+}
+
+.tree_panel_filter--content span,
+.tree_panel_filter--content_raised span {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tree_panel_filter--content span:first-child,
+.tree_panel_filter--content_raised span:first-child {
+ width: calc(100% - 80px);
+ text-overflow: ellipsis;
+ white-space: nowrap;
+ overflow: hidden;
+}
+
+.tree_panel_filter--clear {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  cursor: pointer;
+  width: 20px;
+  height: 100%;
+  text-align: center;
+}
+
+.tree_panel_filter--modal {
+  position: absolute;
+  left: 0;
+  top: 32px;
+  z-index: 9999;
+  width: 630px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  background: #fff;
+}
+
+.tree-panel-filter-mask {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  min-height: 100%;
+  min-width: 100%;
+  height: auto;
+  width: auto;
+  opacity: 0;
+  z-index: 9998;
+  background-color: #fff;
+  filter: alpha(opacity=0);
+}

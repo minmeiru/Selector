@@ -6,130 +6,115 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>tree select component</title>
   <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./assets/css/index.css">
   <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
   
-  <style>
-    .panel {
-      display: none;
-      width: 630px;
-      padding: 15px;
-      margin-top: 20px;
-      margin-left: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      background: #fff;
-    }
-    
-    .department_filter {
-      display: inline-block;
-      width: 200px;
-      height: 32px;
-      line-height: 1.5;
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-      font-size: 14px;
-      padding: 4px 11px;
-      background-color: #fff;
-      color: rgba(0, 0, 0, 0.65);
-      vertical-align: bottom;
-    }
-    
-    .department_filter--content {
-      background-color: #00f;
-      border-radius: 5px;
-      padding: 0 20px 0 5px;
-      color: #fff;
-      position: relative;
-    }
-
-    .department_filter--content__clear {
-      position: absolute;
-      right: 0;
-      top: 0;
-      z-index: 10;
-      cursor: pointer;
-      width: 20px;
-      height: 100%;
-      text-align: center;
-      line-height: 22px;
-    }
-    
-    .department_filter--content span {
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .department_filter--content span:first-child {
-      width: calc(100% - 90px);
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-  </style>
-  
-  <script>
-    const scriptDom = document.createElement('script');
-    scriptDom.src = `./dist/ik-tree-panel.min.js?t=${+new Date()}`;  // 本地测试地址，加入时间戳，防止浏览器本地缓存
-    document.head.appendChild(scriptDom);
-  </script>
+  <script src="./dist/ik-tree-panel.min.js"></script>
 </head>
 <body>
   <h1>tree select</h1>
-  <div class="department_filter">
-    <div class="department_filter--content">
-      <div class="content"></div>
-      <div class="department_filter--content__clear glyphicon glyphicon-remove"></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div id="ik_tree_select"></div>
-    
-    <div style="margin-top: 20px;">
-      <button type="button" class="btn btn-primary save">保存</button>
-      <button type="button" class="btn btn-default cancel">取消</button>
+  <div class="tree_panel_filter">
+    <div class="tree_panel_filter--select">
+      <div class="tree_panel_filter--content"></div>
     </div>
   </div>
 
   <script>
-    const token1 = '812033256ea7fcc30a61c6c9a686f206';
-    const token2 = '02eae450e520239bbc7c98273b070e48';
-    
-    const defaultDepartments = [
-      { "id": 4351, "name": "牛磺酸室", "type": "parent" },
-      { "id": 4352, "name": "忍冬科科室", "type": "parent" },
-      { "id": 4355, "name": "444000000", "type": "parent" },
-      { "id": 4373, "name": "99999", "type": "parent" },
-      { "id": 4374, "name": "99999", "type": "parent" },
-      { "id": 4379, "name": "56567667", "type": "parent" },
-      { "id": 4381, "name": "test_dept", "type": "parent" },
-      { "id": 4382, "name": "test_dept2", "type": "parent" },
-    ];
-    
-    window.onload = function() {
+    $(function() {
+      var $treePanelContent = $('.tree_panel_filter--content');
+      var is_include_sub = false;
+      var lists = [];
+      var changeLists = [];
+  
+      const defaultDepartments = [
+        { "id": 4351, "name": "牛磺酸室", "type": "parent" },
+        { "id": 4352, "name": "忍冬科科室", "type": "parent" },
+        { "id": 4355, "name": "444000000", "type": "parent" },
+        { "id": 4373, "name": "99999", "type": "parent" },
+        { "id": 4374, "name": "99999", "type": "parent" },
+        { "id": 4379, "name": "56567667", "type": "parent" },
+        { "id": 4381, "name": "test_dept", "type": "parent" },
+        { "id": 4382, "name": "test_dept2", "type": "parent" },
+      ];
+  
+      changeLists = defaultDepartments;
+  
       $.ajax({
         url: 'http://ding-dev.ikcrm.com/api/pc/report_center/departments',
         type: 'GET',
         dataType: 'json',
         beforeSend: function(xhr) {
+          const token1 = '812033256ea7fcc30a61c6c9a686f206';
+          const token2 = '02eae450e520239bbc7c98273b070e48';
           xhr.setRequestHeader('Authorization', `Token token="${token2}"`)
         },
         success: function(res) {
           if (res.code === 0) {
-            treeSelect(res.data.lists);
+            var departments = res.data.departments || [];
+            var users = res.data.users || [];
+            lists = res.data.lists;
+  
+            for (var i = 0; i < departments.length; i++) {
+              changeLists.push(departments[i]);
+            }
+  
+            if (is_include_sub) {
+              for (var i = 0; i < users.length; i++) {
+                changeLists.push(users[i]);
+              }
+            }
+  
+            render($treePanelContent, changeLists);
           }
         },
       });
-      
-      function treeSelect(data) {
-        const defaultDepartmentNames = defaultDepartments.map(o => o.name);
-
-        const ikTreeSelect = new IkTreePanelFilter({
+  
+      $(window).on('resize', function(e) {
+        $('.tree_panel_filter').show();
+        var J_tree_panel_filter = $('#J_tree_panel_filter');
+        if (J_tree_panel_filter.length === 0) return;
+    
+        var offset = $('.tree_panel_filter').offset();
+        var width = $('.tree_panel_filter').outerWidth(false);
+    
+        J_tree_panel_filter.css({
+          position: 'absolute',
+          left: offset.left || 0,
+          top: offset.top || 0,
+          width: width || '250px',
+          zIndex: 9999,
+        });
+        $('.tree_panel_filter').hide();
+      });
+  
+      $('.tree_panel_filter').on('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var offset = $(this).offset();
+        var width = $(this).outerWidth(false);
+        var target = e.target;
+    
+        if ($(target).hasClass('fa-close')) {
+          removeTreePanel();
+          render($treePanelContent);
+          changeLists = [];
+          return;
+        }
+    
+        $(this).hide();
+    
+        createMask();
+        $('body').append(createContainer({ left: offset.left, top: offset.top, width: width }));
+        var $treePanelContentRaised = $('.tree_panel_filter--content_raised');
+        render($treePanelContentRaised, changeLists);
+    
+        var ikTreePanelFilter = new IkTreePanelFilter({
           element: document.getElementById('ik_tree_select'),
-          data,
-          defaultSelections: defaultDepartments,
-          inputPlaceholder: '搜索部门',
-          selectColTitleText: '已选择的用户',
-          isIncludeSub: false,
+          data: lists,
+          defaultSelections: changeLists,
+          inputPlaceholder: is_include_sub ? '搜索用户' : '搜索部门',
+          selectColTitleText: is_include_sub ? '已选择的用户' : '已选择的部门',
+          isIncludeSub: is_include_sub,
           fieldKeys: {
             subs: 'users',
             parent: 'department',
@@ -144,52 +129,146 @@
             },
           },
           onChange: (data) => {
-            console.log('select data', data);
-            const list = data.map(o => o.name);
-            render(list.join('、'), list.length);
+            render($treePanelContentRaised, data);
           },
         });
-        ikTreeSelect.run();
-  
-        $('.department_filter').on('click', function() {
-          if ($('.panel').is(':visible')) return;
-          $('.panel').show();
-          ikTreeSelect.run();
-        });
-  
-        $('.department_filter--content__clear').on('click', function(e) {
+    
+        ikTreePanelFilter.run();
+    
+        $('.tree_panel_filter--select_raised').on('click', function(e) {
           e.stopPropagation();
           e.preventDefault();
-          
-          ikTreeSelect.clear();
+      
+          if ($(e.target).hasClass('fa-close')) {
+            $('.tree_panel_filter').show();
+            removeTreePanel();
+            render($treePanelContent);
+            render($treePanelContentRaised);
+            changeLists = [];
+            return;
+          }
         });
-  
-        $('.save').on('click', function() {
-          $('.panel').hide();
-          ikTreeSelect.save((result) => {
-            console.log('save', result);
+    
+        $('.tree_panel_filter--modal .save').on('click', function() {
+          $('.tree_panel_filter').show();
+          removeTreePanel();
+          ikTreePanelFilter.save(function(result) {
+            var department_ids = [];
+            var user_ids = [];
+            if (result) {
+              for (let i = 0; i < result.length; i++) {
+                if (result[i].type === 'parent') {
+                  department_ids.push(result[i].id);
+                } else if (result[i].type === 'sub') {
+                  user_ids.push(result[i].id);
+                }
+              }
+            }
+        
+            if (is_include_sub) {
+              $("input[name=user_ids]").val(user_ids.join(','));
+              $("input[name=department_ids]").val(department_ids.join(','));
+            } else {
+              $("input[name=department_ids]").val(department_ids.join(','));
+            }
+        
+            $('#content').find('form').submit();
+        
+            changeLists = result;
+            render($treePanelContent, result);
           });
         });
-  
-        $('.cancel').on('click', function() {
-          $('.panel').hide();
-          ikTreeSelect.cancel((result) => {
-            console.log('cancel', result);
+    
+        $('.tree_panel_filter--modal .cancel').on('click', function() {
+          $('.tree_panel_filter').show();
+          removeTreePanel();
+          ikTreePanelFilter.cancel(function(result) {
+            render($treePanelContent, result);
           });
         });
-  
-  
-        function render(str, len) {
-          const departmentFilterContentHtmlStr = `
-            <span>${str}</span>
-            <span>等${len}个用户</span>
-          `;
-          $('.department_filter--content').find('.content').html(departmentFilterContentHtmlStr);
+    
+      });
+
+      function render($elem, arr) {
+        if (!arr) {
+          $elem.hide().html('');
+          return;
         }
-  
-        render(defaultDepartmentNames.join('、'), defaultDepartmentNames.length);
+    
+        const names = [];
+        for (let i = 0; i < arr.length; i++) {
+          names.push(arr[i].name);
+        }
+    
+        let html = '';
+        const len = names.length;
+    
+        if (len === 0) {
+          $elem.hide().html('');
+          return;
+        } else if (len === 1) {
+          html = names[0];
+        } else {
+          html = names[0] + '、' + names[1];
+        }
+    
+        const htmlStr = '<span>'+ html +'</span><span>等'+ len +'个选项</span><div class="tree_panel_filter--clear"><i class="glyphicon glyphicon-remove fa-close"></i></div>';
+        $elem.show().html(htmlStr);
       }
-    };
+  
+      function createMask() {
+        var mask = $("#tree-panel-filter-mask");
+        if (mask.length === 0) {
+          mask = $(document.createElement("div"));
+          mask.attr("id","tree-panel-filter-mask").attr("class","tree-panel-filter-mask");
+          mask.hide();
+          mask.appendTo($('body'));
+          mask.on("mousedown touchstart click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $('.tree_panel_filter').show();
+            removeTreePanel();
+          });
+        }
+    
+        mask.show();
+      }
+  
+      function createContainer(opts) {
+        var style = opts || {};
+        var container = $(document.createElement('div')).css({
+          position: 'absolute',
+          left: style.left || 0,
+          top: style.top || 0,
+          width: style.width || '250px',
+          zIndex: 9999,
+        }).attr({
+          "id": 'J_tree_panel_filter',
+          "class": "tree_panel_filter_active",
+        }).html([
+          '<div class="tree_panel_filter--select_raised">',
+          '  <div class="tree_panel_filter--content_raised"></div>',
+          '  <i class="fa fa-angle-down"></i>',
+          '</div>',
+          '<div class="tree_panel_filter--modal">',
+          '  <input type="hidden" name="department_ids" id="department_ids" value="">',
+          '  <input type="hidden" name="user_ids" id="user_ids" value="">',
+          '  <div id="ik_tree_select"></div>',
+          '  <div>',
+          '    <button type="button" class="btn btn-primary save">保存</button>',
+          '    <button type="button" class="btn btn-default cancel">取消</button>',
+          '  </div>',
+          '</div>',
+        ].join(''));
+    
+        return container;
+      }
+  
+      function removeTreePanel() {
+        $('#J_tree_panel_filter').remove();
+        $("#tree-panel-filter-mask").remove();
+      }
+    });
   </script>
 </body>
 </html>

@@ -10,7 +10,7 @@ export const Wrapper = styled.div`
 
 export const TreeWrapper = styled.div`
   width: 100%;
-  height: 340px;
+  height: 250px;
   overflow: auto;
   
   .ant-tree {
